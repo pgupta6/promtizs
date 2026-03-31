@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { LandingHero } from './components/LandingHero';
 import { PromptInput } from './components/PromptInput';
 import { ScoreDisplay } from './components/ScoreDisplay';
+import { ScoreSkeleton } from './components/ScoreSkeleton';
 import { HistoryPanel } from './components/HistoryPanel';
 import { AuthModal } from './components/AuthModal';
 import { usePromptScorer } from './hooks/usePromptScorer';
@@ -69,6 +70,8 @@ function AppContent() {
                   {error}
                 </div>
               )}
+
+              {loading && <ScoreSkeleton />}
 
               {score && <ScoreDisplay result={score} />}
 
