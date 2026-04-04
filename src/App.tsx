@@ -84,7 +84,7 @@ function AppContent() {
               <PromptInput onSubmit={handleSubmit} loading={loading} initialPrompt={lastPrompt?.text} initialModel={lastPrompt?.model} />
 
               {error && (
-                <div className="bg-red-950/50 border border-red-800 rounded-xl p-4 text-sm text-red-300">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-300">
                   {error}
                 </div>
               )}
@@ -94,11 +94,11 @@ function AppContent() {
               {score && <ScoreDisplay result={score} />}
 
               {!user && score && (
-                <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center">
+                <div className="glass rounded-xl p-5 text-center">
                   <p className="text-sm text-gray-400 mb-3">Sign in to save your prompt history and track improvement</p>
                   <button
                     onClick={() => setShowAuth(true)}
-                    className="px-5 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-xl transition-colors"
+                    className="px-5 py-2 gradient-btn text-white text-sm font-medium rounded-xl transition-all hover:-translate-y-px"
                   >
                     Sign In / Sign Up
                   </button>
@@ -117,8 +117,9 @@ function AppContent() {
         </div>
       </main>
 
-      <footer className="border-t border-gray-800 py-6 text-center text-xs text-gray-600">
-        PromtizS &mdash; Score your AI prompts. Get better outputs.
+      <footer className="py-6 text-center text-xs text-gray-600">
+        <div className="gradient-border max-w-5xl mx-auto mb-6" />
+        Promt<span className="text-indigo-400/60">izS</span> &mdash; Score your AI prompts. Get better outputs.
       </footer>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}

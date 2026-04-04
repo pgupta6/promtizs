@@ -17,6 +17,10 @@ export default {
           900: '#312e81',
           950: '#1e1b4b',
         },
+        accent: {
+          400: '#22d3ee',
+          500: '#06b6d4',
+        },
         score: {
           low: '#ef4444',
           mid: '#f59e0b',
@@ -24,7 +28,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
     },
   },

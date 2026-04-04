@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Zap } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
@@ -34,13 +34,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-2xl border border-gray-800 w-full max-w-sm mx-4 p-6">
+      <div className="glass rounded-2xl w-full max-w-sm mx-4 p-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
+              <span className="text-white font-extrabold text-sm leading-none">P</span>
             </div>
-            <span className="font-bold text-white">Promt<span className="text-primary-400">izS</span></span>
+            <span className="font-bold text-white tracking-tight">Promt<span className="gradient-text">izS</span></span>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
             <X className="w-5 h-5" />
@@ -68,9 +68,9 @@ export function AuthModal({ onClose }: AuthModalProps) {
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 h-px bg-gray-800" />
+          <div className="flex-1 gradient-border" />
           <span className="text-xs text-gray-600 uppercase">or</span>
-          <div className="flex-1 h-px bg-gray-800" />
+          <div className="flex-1 gradient-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -80,7 +80,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
-            className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           />
           <input
             type="password"
@@ -89,13 +89,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
             placeholder="Password"
             required
             minLength={6}
-            className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           />
           {error && <p className="text-xs text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 bg-primary-600 hover:bg-primary-500 disabled:bg-gray-700 text-white font-medium rounded-xl transition-colors text-sm"
+            className="w-full px-4 py-2.5 gradient-btn disabled:from-gray-700 disabled:to-gray-700 disabled:shadow-none text-white font-medium rounded-xl transition-all text-sm"
           >
             {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
@@ -103,7 +103,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         <p className="text-xs text-gray-500 text-center mt-4">
           {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button onClick={() => { setIsSignUp(!isSignUp); setError(''); }} className="text-primary-400 hover:underline">
+          <button onClick={() => { setIsSignUp(!isSignUp); setError(''); }} className="text-indigo-400 hover:text-cyan-400 transition-colors">
             {isSignUp ? 'Sign in' : 'Sign up'}
           </button>
         </p>

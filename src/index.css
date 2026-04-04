@@ -4,7 +4,29 @@
 
 @layer base {
   body {
-    @apply bg-gray-950 text-gray-100 antialiased;
+    @apply bg-slate-950 text-gray-100 antialiased;
     margin: 0;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-2xl border border-white/[0.08] shadow-xl shadow-black/20;
+  }
+  .glass-hover {
+    @apply hover:bg-white/[0.06] hover:border-white/[0.12];
+  }
+  .glass-subtle {
+    @apply bg-white/[0.03] border border-white/[0.06];
+  }
+  .gradient-text {
+    @apply bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent;
+  }
+  .gradient-btn {
+    @apply bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-400/30;
+  }
+  .gradient-border {
+    @apply border-0 bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-cyan-400/20;
+    height: 1px;
   }
 }
