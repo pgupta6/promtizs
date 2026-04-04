@@ -75,7 +75,7 @@ function AppContent() {
         <div ref={scorerRef} className="max-w-3xl mx-auto px-4 py-8 space-y-8">
           {(showScorer || score) && (
             <>
-              <PromptInput onSubmit={handleSubmit} loading={loading} />
+              <PromptInput onSubmit={handleSubmit} loading={loading} initialPrompt={lastPrompt?.text} initialModel={lastPrompt?.model} />
 
               {error && (
                 <div className="bg-red-950/50 border border-red-800 rounded-xl p-4 text-sm text-red-300">
@@ -85,7 +85,7 @@ function AppContent() {
 
               {loading && <ScoreSkeleton />}
 
-              {score && <ScoreDisplay result={score} originalPrompt={lastPrompt?.text} />}
+              {score && <ScoreDisplay result={score} />}
 
               {!user && score && (
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center">

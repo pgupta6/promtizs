@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import type { TargetModel } from '../types';
 
 interface PromptInputProps {
   onSubmit: (prompt: string, model: TargetModel) => void;
   loading: boolean;
+  initialPrompt?: string;
+  initialModel?: TargetModel;
 }
 
 const models: { value: TargetModel; label: string }[] = [
@@ -15,9 +17,17 @@ const models: { value: TargetModel; label: string }[] = [
   { value: 'midjourney', label: 'Midjourney' },
 ];
 
-export function PromptInput({ onSubmit, loading }: PromptInputProps) {
-  const [prompt, setPrompt] = useState('');
-  const [model, setModel] = useState<TargetModel>('general');
+export function PromptInput({ onSubmit, loading, initialPrompt, initialModel }: PromptInputProps) {
+  const [prompt, setPrompt] = useState(initialPrompt || '');
+  const [model, setModel] = useState<TargetModel>(initialModel || 'general');
+
+  useEffect(() => {
+    if (initialPrompt !== undefined) setPrompt(initialPrompt);
+  }, [initialPrompt]);
+
+  useEffect(() => {
+    if (initialModel !== undefined) setModel(initialModel);
+  }, [initialModel]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
