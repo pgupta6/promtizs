@@ -65,6 +65,12 @@ function AppContent() {
         onHistoryClick={user ? () => setShowHistory(!showHistory) : undefined}
         showHistory={showHistory}
         onSignIn={!user ? () => setShowAuth(true) : undefined}
+        onLogoClick={() => {
+          setShowHistory(false);
+          setShowScorer(false);
+          setLastPrompt(null);
+          reset();
+        }}
       />
 
       <main className="flex-1">
@@ -73,7 +79,7 @@ function AppContent() {
         )}
 
         <div ref={scorerRef} className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-          {(showScorer || score) && (
+          {(showScorer || score) && !showHistory && (
             <>
               <PromptInput onSubmit={handleSubmit} loading={loading} initialPrompt={lastPrompt?.text} initialModel={lastPrompt?.model} />
 
