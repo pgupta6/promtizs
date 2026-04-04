@@ -13,7 +13,7 @@ import type { TargetModel, PromptHistoryEntry, ScoreResult } from './types';
 
 function AppContent() {
   const { user } = useAuth();
-  const { score, loading, error, scorePrompt, reset } = usePromptScorer();
+  const { score, loading, error, scorePrompt, setScore, reset } = usePromptScorer();
   const { history, loading: historyLoading, saveEntry } = usePromptHistory();
   const [showHistory, setShowHistory] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -37,8 +37,19 @@ function AppContent() {
     }
   }
 
-  const handleHistorySelect = (_entry: PromptHistoryEntry) => {
+  const handleHistorySelect = (entry: PromptHistoryEntry) => {
+    const restored: ScoreResult = {
+      score: entry.score,
+      dimensions: entry.dimensions,
+      improved_prompt: entry.improved_prompt,
+      changes: entry.changes,
+      summary: '',
+    };
+    setScore(restored);
+    lastSavedRef.current = restored; // prevent re-saving to history
+    setLastPrompt({ text: entry.original_prompt, model: entry.target_model });
     setShowHistory(false);
+    setShowScorer(true);
   };
 
   const handleGetStarted = () => {

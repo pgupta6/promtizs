@@ -7,6 +7,7 @@ interface UsePromptScorerReturn {
   loading: boolean;
   error: string | null;
   scorePrompt: (prompt: string, targetModel: TargetModel) => Promise<void>;
+  setScore: (score: ScoreResult | null) => void;
   reset: () => void;
 }
 
@@ -39,5 +40,5 @@ export function usePromptScorer(): UsePromptScorerReturn {
     setError(null);
   };
 
-  return { score, loading, error, scorePrompt, reset };
+  return { score, loading, error, scorePrompt, setScore, reset };
 }
