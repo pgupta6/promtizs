@@ -85,7 +85,7 @@ function AppContent() {
 
               {loading && <ScoreSkeleton />}
 
-              {score && <ScoreDisplay result={score} />}
+              {score && <ScoreDisplay result={score} originalPrompt={lastPrompt?.text} />}
 
               {!user && score && (
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center">

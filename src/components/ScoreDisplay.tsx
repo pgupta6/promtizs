@@ -5,6 +5,7 @@ import { getScoreColor, getScoreBarColor, getScoreLabel, formatDimensions } from
 
 interface ScoreDisplayProps {
   result: ScoreResult;
+  originalPrompt?: string;
 }
 
 function AnimatedScore({ target }: { target: number }) {
@@ -55,7 +56,7 @@ function DimensionBar({ label, score, max, feedback }: { label: string; score: n
   );
 }
 
-export function ScoreDisplay({ result }: ScoreDisplayProps) {
+export function ScoreDisplay({ result, originalPrompt }: ScoreDisplayProps) {
   const [copied, setCopied] = useState(false);
   const [showChanges, setShowChanges] = useState(false);
   const dimensions = formatDimensions(result.dimensions);
@@ -89,6 +90,20 @@ export function ScoreDisplay({ result }: ScoreDisplayProps) {
           ))}
         </div>
       </div>
+
+      {/* Original Prompt */}
+      {originalPrompt && (
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="p-4 border-b border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Original Prompt</h3>
+          </div>
+          <div className="p-5">
+            <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap font-mono">
+              {originalPrompt}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Improved Prompt */}
       <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
