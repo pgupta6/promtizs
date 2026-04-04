@@ -48,5 +48,5 @@ npm run lint         # ESLint check
 
 ## Workflow
 
-- Always create a commit and PR after making changes
+- Always commit and push changes to GitHub after making them — don't wait to be asked
 - Deploy via GitHub Actions on push to main
