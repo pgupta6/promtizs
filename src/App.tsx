@@ -57,7 +57,7 @@ function AppContent() {
       />
 
       <main className="flex-1">
-        {!showScorer && !score && (
+        {!showScorer && !score && !showHistory && (
           <LandingHero onGetStarted={handleGetStarted} />
         )}
 
