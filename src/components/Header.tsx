@@ -1,12 +1,13 @@
-import { Zap, LogOut, History, User } from 'lucide-react';
+import { Zap, LogOut, History, User, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   onHistoryClick?: () => void;
   showHistory?: boolean;
+  onSignIn?: () => void;
 }
 
-export function Header({ onHistoryClick, showHistory }: HeaderProps) {
+export function Header({ onHistoryClick, showHistory, onSignIn }: HeaderProps) {
   const { user, signOut } = useAuth();
 
   return (
@@ -53,6 +54,14 @@ export function Header({ onHistoryClick, showHistory }: HeaderProps) {
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
+          ) : onSignIn ? (
+            <button
+              onClick={onSignIn}
+              className="flex items-center gap-2 px-4 py-1.5 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              Sign In
+            </button>
           ) : null}
         </div>
       </div>

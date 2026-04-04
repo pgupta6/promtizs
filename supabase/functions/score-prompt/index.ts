@@ -135,7 +135,10 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    const content = data.content[0]?.text;
+    let content = data.content[0]?.text;
+
+    // Strip markdown code fences if present (e.g. ```json ... ```)
+    content = content.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
 
     // Parse the JSON response from Claude
     const jsonMatch = content.match(/\{[\s\S]*\}/);

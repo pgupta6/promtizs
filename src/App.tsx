@@ -53,6 +53,7 @@ function AppContent() {
       <Header
         onHistoryClick={user ? () => setShowHistory(!showHistory) : undefined}
         showHistory={showHistory}
+        onSignIn={!user ? () => setShowAuth(true) : undefined}
       />
 
       <main className="flex-1">
