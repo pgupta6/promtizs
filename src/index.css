@@ -3,21 +3,40 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --score-ring-bg: #e2e8f0;
+  }
+  .dark {
+    --score-ring-bg: rgba(255,255,255,0.06);
+  }
+
   body {
-    @apply bg-slate-950 text-gray-100 antialiased;
+    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-200;
     margin: 0;
+  }
+  :is(.dark body) {
+    @apply bg-slate-950 text-gray-100;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/[0.04] backdrop-blur-2xl border border-white/[0.08] shadow-xl shadow-black/20;
+    @apply bg-white border border-gray-200 shadow-lg shadow-black/5;
+  }
+  :is(.dark .glass) {
+    @apply bg-white/[0.04] backdrop-blur-2xl border-white/[0.08] shadow-xl shadow-black/20;
   }
   .glass-hover {
+    @apply hover:bg-gray-50;
+  }
+  :is(.dark .glass-hover) {
     @apply hover:bg-white/[0.06] hover:border-white/[0.12];
   }
   .glass-subtle {
-    @apply bg-white/[0.03] border border-white/[0.06];
+    @apply bg-gray-50 border border-gray-200;
+  }
+  :is(.dark .glass-subtle) {
+    @apply bg-white/[0.03] border-white/[0.06];
   }
   .gradient-text {
     @apply bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent;

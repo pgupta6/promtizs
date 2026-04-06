@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { LandingHero } from './components/LandingHero';
 import { PromptInput } from './components/PromptInput';
@@ -84,7 +85,7 @@ function AppContent() {
               <PromptInput onSubmit={handleSubmit} loading={loading} initialPrompt={lastPrompt?.text} initialModel={lastPrompt?.model} />
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-300">
+                <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-300 rounded-xl p-4 text-sm">
                   {error}
                 </div>
               )}
@@ -95,7 +96,7 @@ function AppContent() {
 
               {!user && score && (
                 <div className="glass rounded-xl p-5 text-center">
-                  <p className="text-sm text-gray-400 mb-3">Sign in to save your prompt history and track improvement</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Sign in to save your prompt history and track improvement</p>
                   <button
                     onClick={() => setShowAuth(true)}
                     className="px-5 py-2 gradient-btn text-white text-sm font-medium rounded-xl transition-all hover:-translate-y-px"
@@ -117,7 +118,7 @@ function AppContent() {
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs text-gray-600">
+      <footer className="py-6 text-center text-xs text-gray-400 dark:text-gray-600">
         <div className="gradient-border max-w-5xl mx-auto mb-6" />
         Promt<span className="text-indigo-400/60">izS</span> &mdash; Score your AI prompts. Get better outputs.
       </footer>
@@ -129,8 +130,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

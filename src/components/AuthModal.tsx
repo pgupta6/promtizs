@@ -33,30 +33,30 @@ export function AuthModal({ onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm">
       <div className="glass rounded-2xl w-full max-w-sm mx-4 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
               <span className="text-white font-extrabold text-sm leading-none">P</span>
             </div>
-            <span className="font-bold text-white tracking-tight">Promt<span className="gradient-text">izS</span></span>
+            <span className="font-bold text-slate-900 dark:text-white tracking-tight">Promt<span className="gradient-text">izS</span></span>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <h2 className="text-lg font-semibold text-white mb-1">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
           {isSignUp ? 'Create account' : 'Welcome back'}
         </h2>
-        <p className="text-sm text-gray-400 mb-5">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
           {isSignUp ? 'Sign up to save your prompt history' : 'Sign in to access your prompt history'}
         </p>
 
         <button
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-900 font-medium rounded-xl hover:bg-gray-100 transition-colors text-sm mb-4"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-white text-gray-900 font-medium rounded-xl hover:bg-gray-100 transition-colors text-sm mb-4 border border-gray-200 dark:border-transparent"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -69,7 +69,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 gradient-border" />
-          <span className="text-xs text-gray-600 uppercase">or</span>
+          <span className="text-xs text-gray-400 dark:text-gray-600 uppercase">or</span>
           <div className="flex-1 gradient-border" />
         </div>
 
@@ -80,7 +80,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
-            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl text-sm text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           />
           <input
             type="password"
@@ -89,13 +89,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
             placeholder="Password"
             required
             minLength={6}
-            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl text-sm text-slate-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           />
-          {error && <p className="text-xs text-red-400">{error}</p>}
+          {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 gradient-btn disabled:from-gray-700 disabled:to-gray-700 disabled:shadow-none text-white font-medium rounded-xl transition-all text-sm"
+            className="w-full px-4 py-2.5 gradient-btn disabled:from-gray-300 disabled:to-gray-300 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:shadow-none text-white font-medium rounded-xl transition-all text-sm"
           >
             {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>

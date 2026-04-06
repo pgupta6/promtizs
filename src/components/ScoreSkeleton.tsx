@@ -23,7 +23,7 @@ export function ScoreSkeleton() {
       <div className="flex flex-col items-center gap-3 py-4">
         <div className="relative w-24 h-24">
           <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
-            <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+            <circle cx="48" cy="48" r="40" fill="none" stroke="var(--score-ring-bg)" strokeWidth="6" />
             <defs>
               <linearGradient id="skeletonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#6366f1" />
@@ -42,7 +42,7 @@ export function ScoreSkeleton() {
             {Math.round(((step + 1) / steps.length) * 100)}%
           </span>
         </div>
-        <p className="text-sm text-gray-400 transition-all duration-300">{steps[step]}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 transition-all duration-300">{steps[step]}</p>
       </div>
 
       {/* Skeleton bars */}
@@ -50,12 +50,12 @@ export function ScoreSkeleton() {
         {[...Array(7)].map((_, i) => (
           <div key={i} className="space-y-2">
             <div className="flex justify-between">
-              <div className="h-3 w-24 bg-white/[0.06] rounded" />
-              <div className="h-3 w-8 bg-white/[0.06] rounded" />
+              <div className="h-3 w-24 bg-gray-200 dark:bg-white/[0.06] rounded" />
+              <div className="h-3 w-8 bg-gray-200 dark:bg-white/[0.06] rounded" />
             </div>
-            <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-gray-200 dark:bg-white/[0.06] rounded-full overflow-hidden">
               <div
-                className="h-full bg-white/[0.04] rounded-full animate-pulse"
+                className="h-full bg-gray-300 dark:bg-white/[0.04] rounded-full animate-pulse"
                 style={{ width: `${30 + Math.random() * 40}%`, animationDelay: `${i * 150}ms` }}
               />
             </div>
