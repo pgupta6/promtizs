@@ -1,6 +1,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 const SYSTEM_PROMPT = `You are a prompt quality evaluator. You analyze AI prompts and score them across 7 dimensions.
 
@@ -50,14 +60,7 @@ Respond ONLY with valid JSON in this exact format:
 Deno.serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
-    return new Response("ok", {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "authorization, x-client-info, apikey, content-type",
-      },
-    });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   if (!ANTHROPIC_API_KEY) {
@@ -65,12 +68,71 @@ Deno.serve(async (req) => {
       JSON.stringify({ error: "Anthropic API key not configured" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
+  }
+
+  // Auth: extract user from JWT
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: "Authentication required" }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
+  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+  const token = authHeader.replace("Bearer ", "");
+  const {
+    data: { user },
+    error: authError,
+  } = await supabaseAdmin.auth.getUser(token);
+
+  if (authError || !user) {
+    return new Response(
+      JSON.stringify({ error: "Invalid or expired token" }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
+  // Ensure user_usage row exists (handles existing users without one)
+  await supabaseAdmin
+    .from("user_usage")
+    .upsert(
+      { user_id: user.id, prompt_count: 0 },
+      { onConflict: "user_id", ignoreDuplicates: true }
+    );
+
+  // Atomic rate limit check + increment via RPC
+  const { data: allowed, error: rpcError } = await supabaseAdmin.rpc(
+    "check_and_increment_usage",
+    { p_user_id: user.id }
+  );
+
+  if (rpcError) {
+    console.error("Usage check error:", rpcError);
+    return new Response(
+      JSON.stringify({ error: "Internal server error" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: "limit_reached" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 
   try {
@@ -79,22 +141,18 @@ Deno.serve(async (req) => {
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "Prompt is required" }), {
         status: 400,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
     if (prompt.length > 10000) {
       return new Response(
-        JSON.stringify({ error: "Prompt too long (max 10,000 characters)" }),
+        JSON.stringify({
+          error: "Prompt too long (max 10,000 characters)",
+        }),
         {
           status: 400,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
+          headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
@@ -123,13 +181,12 @@ Deno.serve(async (req) => {
       const errorText = await response.text();
       console.error("Anthropic API error:", errorText);
       return new Response(
-        JSON.stringify({ error: "Failed to score prompt. Please try again." }),
+        JSON.stringify({
+          error: "Failed to score prompt. Please try again.",
+        }),
         {
           status: 502,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
+          headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
@@ -138,7 +195,9 @@ Deno.serve(async (req) => {
     let content = data.content[0]?.text;
 
     // Strip markdown code fences if present (e.g. ```json ... ```)
-    content = content.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+    content = content
+      .replace(/^```(?:json)?\s*\n?/i, "")
+      .replace(/\n?```\s*$/i, "");
 
     // Parse the JSON response from Claude
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -147,10 +206,7 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Failed to parse scoring response" }),
         {
           status: 500,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
+          headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
@@ -158,22 +214,13 @@ Deno.serve(async (req) => {
     const scoreResult = JSON.parse(jsonMatch[0]);
 
     return new Response(JSON.stringify(scoreResult), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {
     console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
-    );
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 });

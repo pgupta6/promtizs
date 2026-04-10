@@ -2,9 +2,11 @@ import { Sparkles, BarChart3, ArrowUpRight } from 'lucide-react';
 
 interface LandingHeroProps {
   onGetStarted: () => void;
+  onSignUp?: () => void;
+  showSignUp?: boolean;
 }
 
-export function LandingHero({ onGetStarted }: LandingHeroProps) {
+export function LandingHero({ onGetStarted, onSignUp, showSignUp }: LandingHeroProps) {
   return (
     <div className="relative text-center py-20 sm:py-32 px-4 overflow-hidden">
       {/* Subtle grid background */}
@@ -28,13 +30,23 @@ export function LandingHero({ onGetStarted }: LandingHeroProps) {
           Paste any AI prompt and get an instant score, detailed feedback across 7 dimensions, and an improved version — with explanations of every change.
         </p>
 
-        <button
-          onClick={onGetStarted}
-          className="inline-flex items-center gap-2.5 px-8 py-4 gradient-btn text-white font-semibold rounded-xl transition-all text-base hover:-translate-y-px"
-        >
-          <Sparkles className="w-5 h-5" />
-          Score a Prompt — Free
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+          <button
+            onClick={onGetStarted}
+            className="inline-flex items-center gap-2.5 px-8 py-4 gradient-btn text-white font-semibold rounded-xl transition-all text-base hover:-translate-y-px"
+          >
+            <Sparkles className="w-5 h-5" />
+            {showSignUp ? 'See It in Action' : 'Score a Prompt — Free'}
+          </button>
+          {showSignUp && onSignUp && (
+            <button
+              onClick={onSignUp}
+              className="inline-flex items-center gap-2 px-6 py-3 glass glass-hover text-slate-900 dark:text-white font-medium rounded-xl transition-all text-sm"
+            >
+              Sign Up Free
+            </button>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-24 max-w-3xl mx-auto">
           {[

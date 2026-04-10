@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
@@ -8,35 +8,65 @@ import { ScoreDisplay } from './components/ScoreDisplay';
 import { ScoreSkeleton } from './components/ScoreSkeleton';
 import { HistoryPanel } from './components/HistoryPanel';
 import { AuthModal } from './components/AuthModal';
+import { DemoAnimation } from './components/DemoAnimation';
+import { SubscriptionModal } from './components/SubscriptionModal';
 import { usePromptScorer } from './hooks/usePromptScorer';
 import { usePromptHistory } from './hooks/usePromptHistory';
+import { useUsageLimit } from './hooks/useUsageLimit';
 import type { TargetModel, PromptHistoryEntry, ScoreResult } from './types';
 
 function AppContent() {
   const { user } = useAuth();
-  const { score, loading, error, scorePrompt, setScore, reset } = usePromptScorer();
+  const { score, loading, error, limitReached: scorerLimitReached, scorePrompt, setScore, reset } = usePromptScorer();
   const { history, loading: historyLoading, saveEntry } = usePromptHistory();
+  const usage = useUsageLimit();
   const [showHistory, setShowHistory] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showScorer, setShowScorer] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scorerRef = useRef<HTMLDivElement>(null);
-  const lastSavedRef = useRef<ScoreResult | null>(null);
   const [lastPrompt, setLastPrompt] = useState<{ text: string; model: TargetModel } | null>(null);
 
+  const effectiveLimitReached = usage.limitReached || scorerLimitReached;
+
   const handleSubmit = async (prompt: string, model: TargetModel) => {
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+
+    if (effectiveLimitReached) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+
     setLastPrompt({ text: prompt, model });
-    lastSavedRef.current = null;
     reset();
     await scorePrompt(prompt, model);
   };
 
   // Save when score updates
-  if (score && lastPrompt && score !== lastSavedRef.current) {
-    lastSavedRef.current = score;
-    if (user) {
-      saveEntry(lastPrompt.text, score, lastPrompt.model);
+  const lastScoreRef = useRef<ScoreResult | null>(null);
+  useEffect(() => {
+    if (score && lastPrompt && score !== lastScoreRef.current) {
+      lastScoreRef.current = score;
+      if (user) {
+        saveEntry(lastPrompt.text, score, lastPrompt.model);
+        usage.increment();
+      }
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [score]);
+
+  // Handle limit_reached error from scorer as fallback
+  useEffect(() => {
+    if (scorerLimitReached) {
+      setShowSubscriptionModal(true);
+      usage.refresh();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scorerLimitReached]);
 
   const handleHistorySelect = (entry: PromptHistoryEntry) => {
     const restored: ScoreResult = {
@@ -47,17 +77,36 @@ function AppContent() {
       summary: '',
     };
     setScore(restored);
-    lastSavedRef.current = restored; // prevent re-saving to history
+    lastScoreRef.current = restored; // prevent re-saving to history
     setLastPrompt({ text: entry.original_prompt, model: entry.target_model });
     setShowHistory(false);
     setShowScorer(true);
+    setShowDemo(false);
   };
 
   const handleGetStarted = () => {
-    setShowScorer(true);
-    setTimeout(() => {
-      scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    if (user) {
+      setShowScorer(true);
+      setShowDemo(false);
+      setTimeout(() => {
+        scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      // Show demo for unauthenticated users
+      setShowDemo(true);
+      setShowScorer(false);
+      setTimeout(() => {
+        scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
+  const handleLogoClick = () => {
+    setShowHistory(false);
+    setShowScorer(false);
+    setShowDemo(false);
+    setLastPrompt(null);
+    reset();
   };
 
   return (
@@ -66,55 +115,58 @@ function AppContent() {
         onHistoryClick={user ? () => setShowHistory(!showHistory) : undefined}
         showHistory={showHistory}
         onSignIn={!user ? () => setShowAuth(true) : undefined}
-        onLogoClick={() => {
-          setShowHistory(false);
-          setShowScorer(false);
-          setLastPrompt(null);
-          reset();
-        }}
+        onLogoClick={handleLogoClick}
       />
 
       <main className="flex-1">
-        {!showScorer && !score && !showHistory && (
-          <LandingHero onGetStarted={handleGetStarted} />
+        {!showScorer && !score && !showHistory && !showDemo && (
+          <LandingHero
+            onGetStarted={handleGetStarted}
+            onSignUp={() => setShowAuth(true)}
+            showSignUp={!user}
+          />
         )}
 
-        <div ref={scorerRef} className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-          {(showScorer || score) && !showHistory && (
-            <>
-              <PromptInput onSubmit={handleSubmit} loading={loading} initialPrompt={lastPrompt?.text} initialModel={lastPrompt?.model} />
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-300 rounded-xl p-4 text-sm">
-                  {error}
-                </div>
-              )}
-
-              {loading && <ScoreSkeleton />}
-
-              {score && <ScoreDisplay result={score} />}
-
-              {!user && score && (
-                <div className="glass rounded-xl p-5 text-center">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Sign in to save your prompt history and track improvement</p>
-                  <button
-                    onClick={() => setShowAuth(true)}
-                    className="px-5 py-2 gradient-btn text-white text-sm font-medium rounded-xl transition-all hover:-translate-y-px"
-                  >
-                    Sign In / Sign Up
-                  </button>
-                </div>
-              )}
-            </>
+        <div ref={scorerRef}>
+          {/* Demo for unauthenticated users */}
+          {showDemo && !user && !showHistory && (
+            <DemoAnimation onSignUp={() => setShowAuth(true)} />
           )}
 
-          {showHistory && user && (
-            <HistoryPanel
-              history={history}
-              loading={historyLoading}
-              onSelect={handleHistorySelect}
-            />
-          )}
+          {/* Scorer for authenticated users */}
+          <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+            {(showScorer || score) && !showHistory && !showDemo && (
+              <>
+                <PromptInput
+                  onSubmit={handleSubmit}
+                  loading={loading}
+                  initialPrompt={lastPrompt?.text}
+                  initialModel={lastPrompt?.model}
+                  used={user ? usage.promptCount : undefined}
+                  max={user ? usage.maxPrompts : undefined}
+                  limitReached={user ? effectiveLimitReached : false}
+                />
+
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-300 rounded-xl p-4 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {loading && <ScoreSkeleton />}
+
+                {score && <ScoreDisplay result={score} />}
+              </>
+            )}
+
+            {showHistory && user && (
+              <HistoryPanel
+                history={history}
+                loading={historyLoading}
+                onSelect={handleHistorySelect}
+              />
+            )}
+          </div>
         </div>
       </main>
 
@@ -124,6 +176,9 @@ function AppContent() {
       </footer>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showSubscriptionModal && (
+        <SubscriptionModal onClose={() => setShowSubscriptionModal(false)} />
+      )}
     </div>
   );
 }

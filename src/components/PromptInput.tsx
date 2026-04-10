@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Lock } from 'lucide-react';
 import type { TargetModel } from '../types';
+import { UsageBadge } from './UsageBadge';
 
 interface PromptInputProps {
   onSubmit: (prompt: string, model: TargetModel) => void;
   loading: boolean;
   initialPrompt?: string;
   initialModel?: TargetModel;
+  used?: number;
+  max?: number;
+  limitReached?: boolean;
 }
 
 const models: { value: TargetModel; label: string }[] = [
@@ -17,7 +21,7 @@ const models: { value: TargetModel; label: string }[] = [
   { value: 'midjourney', label: 'Midjourney' },
 ];
 
-export function PromptInput({ onSubmit, loading, initialPrompt, initialModel }: PromptInputProps) {
+export function PromptInput({ onSubmit, loading, initialPrompt, initialModel, used, max, limitReached }: PromptInputProps) {
   const [prompt, setPrompt] = useState(initialPrompt || '');
   const [model, setModel] = useState<TargetModel>(initialModel || 'general');
 
@@ -64,18 +68,28 @@ export function PromptInput({ onSubmit, loading, initialPrompt, initialModel }: 
         />
 
         <div className="flex items-center justify-between p-3 border-t border-gray-200 dark:border-white/[0.06]">
-          <span className="text-xs text-gray-500 font-mono">
-            {prompt.length} chars
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 font-mono">
+              {prompt.length} chars
+            </span>
+            {used !== undefined && max !== undefined && (
+              <UsageBadge used={used} max={max} />
+            )}
+          </div>
           <button
             type="submit"
-            disabled={!prompt.trim() || loading}
+            disabled={!prompt.trim() || loading || limitReached}
             className="flex items-center gap-2 px-5 py-2.5 gradient-btn disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-700 dark:disabled:text-gray-500 disabled:shadow-none text-white font-medium rounded-xl transition-all text-sm hover:-translate-y-px disabled:hover:translate-y-0"
           >
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Scoring...
+              </>
+            ) : limitReached ? (
+              <>
+                <Lock className="w-4 h-4" />
+                Limit Reached
               </>
             ) : (
               <>
