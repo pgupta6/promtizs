@@ -8,7 +8,6 @@ import { ScoreDisplay } from './components/ScoreDisplay';
 import { ScoreSkeleton } from './components/ScoreSkeleton';
 import { HistoryPanel } from './components/HistoryPanel';
 import { AuthModal } from './components/AuthModal';
-import { DemoAnimation } from './components/DemoAnimation';
 import { SubscriptionModal } from './components/SubscriptionModal';
 import { usePromptScorer } from './hooks/usePromptScorer';
 import { usePromptHistory } from './hooks/usePromptHistory';
@@ -23,7 +22,6 @@ function AppContent() {
   const [showHistory, setShowHistory] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [showScorer, setShowScorer] = useState(false);
-  const [showDemo, setShowDemo] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const scorerRef = useRef<HTMLDivElement>(null);
   const [lastPrompt, setLastPrompt] = useState<{ text: string; model: TargetModel } | null>(null);
@@ -68,6 +66,13 @@ function AppContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scorerLimitReached]);
 
+  // Show subscription modal when user logs in with exhausted limit
+  useEffect(() => {
+    if (user && usage.limitReached && !usage.loading) {
+      setShowSubscriptionModal(true);
+    }
+  }, [user, usage.limitReached, usage.loading]);
+
   const handleHistorySelect = (entry: PromptHistoryEntry) => {
     const restored: ScoreResult = {
       score: entry.score,
@@ -77,37 +82,29 @@ function AppContent() {
       summary: '',
     };
     setScore(restored);
-    lastScoreRef.current = restored; // prevent re-saving to history
+    lastScoreRef.current = restored;
     setLastPrompt({ text: entry.original_prompt, model: entry.target_model });
     setShowHistory(false);
     setShowScorer(true);
-    setShowDemo(false);
   };
 
   const handleGetStarted = () => {
-    if (user) {
-      setShowScorer(true);
-      setShowDemo(false);
-      setTimeout(() => {
-        scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      // Show demo for unauthenticated users
-      setShowDemo(true);
-      setShowScorer(false);
-      setTimeout(() => {
-        scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
+    setShowScorer(true);
+    setTimeout(() => {
+      scorerRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleLogoClick = () => {
     setShowHistory(false);
     setShowScorer(false);
-    setShowDemo(false);
     setLastPrompt(null);
     reset();
   };
+
+  // Unauthenticated: show landing with inline demo
+  // Authenticated: show scorer
+  const showLanding = !user && !showScorer && !score && !showHistory;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -119,23 +116,25 @@ function AppContent() {
       />
 
       <main className="flex-1">
-        {!showScorer && !score && !showHistory && !showDemo && (
-          <LandingHero
-            onGetStarted={handleGetStarted}
-            onSignUp={() => setShowAuth(true)}
-            showSignUp={!user}
-          />
+        {showLanding && (
+          <LandingHero onSignUp={() => setShowAuth(true)} />
         )}
 
-        <div ref={scorerRef}>
-          {/* Demo for unauthenticated users */}
-          {showDemo && !user && !showHistory && (
-            <DemoAnimation onSignUp={() => setShowAuth(true)} />
-          )}
+        {/* Authenticated scorer + history */}
+        {!showLanding && (
+          <div ref={scorerRef} className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+            {user && !showScorer && !score && !showHistory && (
+              <div className="text-center py-8">
+                <button
+                  onClick={handleGetStarted}
+                  className="inline-flex items-center gap-2.5 px-8 py-4 gradient-btn text-white font-semibold rounded-xl transition-all text-base hover:-translate-y-px"
+                >
+                  Score a Prompt
+                </button>
+              </div>
+            )}
 
-          {/* Scorer for authenticated users */}
-          <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-            {(showScorer || score) && !showHistory && !showDemo && (
+            {(showScorer || score) && !showHistory && (
               <>
                 <PromptInput
                   onSubmit={handleSubmit}
@@ -167,7 +166,7 @@ function AppContent() {
               />
             )}
           </div>
-        </div>
+        )}
       </main>
 
       <footer className="py-6 text-center text-xs text-gray-400 dark:text-gray-600">

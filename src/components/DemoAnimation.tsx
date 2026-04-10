@@ -35,15 +35,7 @@ export function DemoAnimation({ onSignUp }: DemoAnimationProps) {
   }, [phase]);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      {/* Demo badge */}
-      <div className="flex justify-center">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-          <Sparkles className="w-3 h-3" />
-          Live Demo
-        </span>
-      </div>
-
+    <div className="max-w-3xl mx-auto px-4 pb-12 space-y-6">
       {/* Fake prompt input */}
       <div className="glass rounded-2xl overflow-hidden shadow-2xl shadow-black/5 dark:shadow-black/25">
         <div className="p-1.5 border-b border-gray-200 dark:border-white/[0.06] flex items-center gap-1">
@@ -51,7 +43,7 @@ export function DemoAnimation({ onSignUp }: DemoAnimationProps) {
             General
           </span>
         </div>
-        <div className="p-5 min-h-[80px]">
+        <div className="p-5 min-h-[60px]">
           <p className="text-slate-900 dark:text-gray-100 text-base leading-relaxed">
             {typedText}
             {phase === 'typing' && (
@@ -61,26 +53,19 @@ export function DemoAnimation({ onSignUp }: DemoAnimationProps) {
         </div>
       </div>
 
-      {/* Loading or result */}
       {phase === 'loading' && <ScoreSkeleton />}
+
       {phase === 'result' && (
         <>
           <ScoreDisplay result={DEMO_RESULT} />
 
-          {/* CTA */}
-          <div className="glass rounded-2xl p-8 text-center space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Ready to score your own prompts?
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Sign up free and get 5 prompt scores to supercharge your AI results.
-            </p>
+          <div className="text-center pt-4">
             <button
               onClick={onSignUp}
-              className="inline-flex items-center gap-2 px-8 py-3 gradient-btn text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-px"
+              className="inline-flex items-center gap-2 px-8 py-3.5 gradient-btn text-white font-semibold rounded-xl transition-all text-sm hover:-translate-y-px"
             >
               <Sparkles className="w-4 h-4" />
-              Sign Up Free
+              Sign Up Free — Score Your Own
             </button>
           </div>
         </>
