@@ -167,13 +167,21 @@ Deno.serve(async (req) => {
         since.setDate(since.getDate() - days);
         const dateFrom = since.toISOString().split("T")[0];
 
-        // Fetch unique visitors trend
+        // Fetch unique visitors trend via PostHog query API
         const response = await fetch(
-          `https://us.posthog.com/api/projects/${POSTHOG_PROJECT_ID}/insights/trend/?events=[{"id":"$pageview","type":"events","math":"dau"}]&date_from=${dateFrom}`,
+          `https://us.posthog.com/api/projects/${POSTHOG_PROJECT_ID}/insights/trend/`,
           {
+            method: "POST",
             headers: {
               Authorization: `Bearer ${POSTHOG_API_KEY}`,
+              "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+              events: [
+                { id: "$pageview", type: "events", math: "dau" },
+              ],
+              date_from: dateFrom,
+            }),
           }
         );
 
