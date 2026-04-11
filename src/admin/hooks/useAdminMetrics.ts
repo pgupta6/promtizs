@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 export interface OverviewData {
   total_users: number;
@@ -56,6 +57,7 @@ async function fetchMetric(metric: string, days: number) {
 }
 
 export function useAdminMetrics(days: number): AdminMetrics {
+  const { session } = useAuth();
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [dailyStats, setDailyStats] = useState<DailyStat[]>([]);
   const [modelStats, setModelStats] = useState<ModelStat[]>([]);
@@ -66,6 +68,7 @@ export function useAdminMetrics(days: number): AdminMetrics {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (!session) return;
     setLoading(true);
     setError(null);
     try {
@@ -97,7 +100,7 @@ export function useAdminMetrics(days: number): AdminMetrics {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }, [days, session]);
 
   useEffect(() => {
     load();
