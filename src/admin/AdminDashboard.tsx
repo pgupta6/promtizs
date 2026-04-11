@@ -9,7 +9,7 @@ import { ScoreHistogram } from './components/ScoreHistogram';
 import { VisitorsChart } from './components/VisitorsChart';
 import { UserGrowthChart } from './components/UserGrowthChart';
 
-const ADMIN_EMAIL = 'priyank.gupta6@gmail.com';
+const ADMIN_EMAIL = 'pgupta6@binghamton.edu';
 const RANGE_OPTIONS = [
   { label: '7d', days: 7 },
   { label: '30d', days: 30 },

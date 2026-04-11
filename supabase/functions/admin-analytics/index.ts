@@ -6,7 +6,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const POSTHOG_API_KEY = Deno.env.get("POSTHOG_API_KEY");
 const POSTHOG_PROJECT_ID = Deno.env.get("POSTHOG_PROJECT_ID");
 
-const ADMIN_EMAIL = "priyank.gupta6@gmail.com";
+const ADMIN_EMAIL = "pgupta6@binghamton.edu";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
