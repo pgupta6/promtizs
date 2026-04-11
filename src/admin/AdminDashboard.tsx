@@ -11,6 +11,7 @@ import { UserGrowthChart } from './components/UserGrowthChart';
 
 const ADMIN_EMAIL = 'pgupta6@binghamton.edu';
 const RANGE_OPTIONS = [
+  { label: '1d', days: 1 },
   { label: '7d', days: 7 },
   { label: '30d', days: 30 },
   { label: '90d', days: 90 },
