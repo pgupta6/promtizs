@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
+import { posthog } from '../lib/posthog';
 import type { User as AppUser } from '../types';
 import type { Session } from '@supabase/supabase-js';
 
@@ -43,8 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           full_name: session.user.user_metadata?.full_name,
           avatar_url: session.user.user_metadata?.avatar_url,
         });
+        posthog.identify(session.user.id, { email: session.user.email });
       } else {
         setUser(null);
+        posthog.reset();
       }
     });
 

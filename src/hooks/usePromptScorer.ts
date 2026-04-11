@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { posthog } from '../lib/posthog';
 import type { ScoreResult, TargetModel } from '../types';
 
 interface UsePromptScorerReturn {
@@ -45,7 +46,9 @@ export function usePromptScorer(): UsePromptScorerReturn {
         return;
       }
 
-      setScore(data as ScoreResult);
+      const result = data as ScoreResult;
+      setScore(result);
+      posthog.capture('prompt_scored', { model: targetModel, score: result.score });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to score prompt');
     } finally {

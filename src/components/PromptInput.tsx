@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Send, Loader2, Lock } from 'lucide-react';
+import { posthog } from '../lib/posthog';
 import type { TargetModel } from '../types';
 import { UsageBadge } from './UsageBadge';
 
@@ -47,7 +48,7 @@ export function PromptInput({ onSubmit, loading, initialPrompt, initialModel, us
             <button
               key={m.value}
               type="button"
-              onClick={() => setModel(m.value)}
+              onClick={() => { setModel(m.value); posthog.capture('model_selected', { model: m.value }); }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 model === m.value
                   ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/25'

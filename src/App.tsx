@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
+import { useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import { LandingHero } from './components/LandingHero';
 import { PromptInput } from './components/PromptInput';
@@ -172,11 +171,5 @@ function AppContent() {
 }
 
 export default function App() {
-  return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </ThemeProvider>
-  );
+  return <AppContent />;
 }
