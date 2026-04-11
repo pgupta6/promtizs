@@ -17,7 +17,7 @@ const RANGE_OPTIONS = [
 ];
 
 export function AdminDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [days, setDays] = useState(30);
   const metrics = useAdminMetrics(days);
 
@@ -29,12 +29,28 @@ export function AdminDashboard() {
     );
   }
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-gray-500 dark:text-gray-400">
+        <ShieldX className="w-16 h-16 text-red-400" />
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Access</h1>
+        <p>Please sign in to continue.</p>
+        <button
+          onClick={signInWithGoogle}
+          className="px-4 py-2 gradient-btn text-white rounded-xl text-sm font-medium"
+        >
+          Sign in with Google
+        </button>
+      </div>
+    );
+  }
+
+  if (user.email !== ADMIN_EMAIL) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-gray-500 dark:text-gray-400">
         <ShieldX className="w-16 h-16 text-red-400" />
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Access Denied</h1>
-        <p>You don't have permission to view this page.</p>
+        <p>Signed in as {user.email} — not authorized.</p>
         <a href="/" className="text-indigo-500 hover:underline text-sm">Back to PromtizS</a>
       </div>
     );
