@@ -3,9 +3,10 @@ import { DemoAnimation } from './DemoAnimation';
 
 interface LandingHeroProps {
   onSignUp: () => void;
+  isLoggedIn?: boolean;
 }
 
-export function LandingHero({ onSignUp }: LandingHeroProps) {
+export function LandingHero({ onSignUp, isLoggedIn }: LandingHeroProps) {
   return (
     <div className="relative overflow-hidden">
       {/* Subtle grid background */}
@@ -46,7 +47,7 @@ export function LandingHero({ onSignUp }: LandingHeroProps) {
             className="inline-flex items-center gap-2.5 px-8 py-4 gradient-btn text-white font-semibold rounded-xl transition-all text-base hover:-translate-y-px"
           >
             <Sparkles className="w-5 h-5" />
-            Sign Up Free — 5 Prompts
+            {isLoggedIn ? 'Score a Prompt' : 'Sign Up Free — 5 Prompts'}
           </button>
         </div>
 

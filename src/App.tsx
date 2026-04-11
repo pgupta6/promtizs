@@ -104,7 +104,7 @@ function AppContent() {
 
   // Unauthenticated: show landing with inline demo
   // Authenticated: show scorer
-  const showLanding = !user && !showScorer && !score && !showHistory;
+  const showLanding = !showScorer && !score && !showHistory;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -117,23 +117,12 @@ function AppContent() {
 
       <main className="flex-1">
         {showLanding && (
-          <LandingHero onSignUp={() => setShowAuth(true)} />
+          <LandingHero onSignUp={user ? handleGetStarted : () => setShowAuth(true)} isLoggedIn={!!user} />
         )}
 
-        {/* Authenticated scorer + history */}
+        {/* Scorer + history */}
         {!showLanding && (
           <div ref={scorerRef} className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-            {user && !showScorer && !score && !showHistory && (
-              <div className="text-center py-8">
-                <button
-                  onClick={handleGetStarted}
-                  className="inline-flex items-center gap-2.5 px-8 py-4 gradient-btn text-white font-semibold rounded-xl transition-all text-base hover:-translate-y-px"
-                >
-                  Score a Prompt
-                </button>
-              </div>
-            )}
-
             {(showScorer || score) && !showHistory && (
               <>
                 <PromptInput
